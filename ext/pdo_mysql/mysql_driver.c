@@ -735,6 +735,17 @@ static int pdo_mysql_handle_factory(pdo_dbh_t *dbh, zval *driver_options)
 			}
 		}
 #endif
+
+#ifdef PDO_USE_MYSQLND
+		{
+			zend_long verify_attr = pdo_attr_lval(driver_options,
+					PDO_MYSQL_ATTR_SSL_VERIFY_SERVER_CERT, -1);
+			zend_long verify = (verify_attr == -1) ?
+				MYSQLND_SSL_PEER_DEFAULT_ACTION :
+				(verify_attr ? MYSQLND_SSL_PEER_VERIFY : MYSQLND_SSL_PEER_DONT_VERIFY);
+			mysql_options(H->server, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, (const char *) &verify);
+		}
+#endif
 	}
 
 #ifdef PDO_MYSQL_HAS_CHARSET
